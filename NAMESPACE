@@ -1,0 +1,32 @@
+useDynLib( kinference, .registration=TRUE)
+export( "autopick_threshold",
+"chain_pairwise",
+"check6and4",
+"drop_dups_pairwise_equiv",
+"est_ALF_6way",
+"est_ALF_ABCO",
+"est_ALF_ABO_quick",
+"est_ALF_nonulls",
+"find_duplicates",
+"find_dups_with_missing",
+"find_HSPs",
+"find_POPs",
+"find_POPs_lglk",
+"get_chain",
+"hetzminoo_fancy",
+"histoPLOD",
+"ilglk_geno",
+"kin_power",
+"kinPalette",
+"prepare_PLOD_SPA",
+"re_est_ALF",
+"split_FSPs_from_HSPs",
+"split_FSPs_from_POPs",
+"split_HSPs_from_HTPs",
+"var_PLOD_kin")
+import( gbasics)
+import( Rcpp)
+import( atease)
+import( mvbutils)
+import( vecless)
+

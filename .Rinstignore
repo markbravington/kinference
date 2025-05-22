@@ -1,0 +1,11 @@
+# this does not work right FFS
+^.*\.Rproj$
+^\.Rproj\.user$
+^README.Md
+^doc$
+^Meta$
+[.]/R/funs[.]rda
+R/meta.vignette.rds
+inst/tinytest/SMB
+tinytest/SMB
+src/kinference-vsc.code-workspace
