@@ -53,7 +53,7 @@ Given its intended use, \code{kinference} quite reasonably ignores LD. However, 
 \seealso{
 The vignette \code{kinference-vignette} (qv).
 
-And for the categories of task and the functions within each:
+And for the categories of task, and the functions within each:
 \subsection{Locus qc}{\code{\link{check6and4}}
 }
 \subsection{Sample qc}{\code{\link{ilglk_geno}}, \code{\link{hetzminoo_fancy}}, \code{\link{find_duplicates}}, \code{\link{find_dups_with_missing}}, \code{\link{drop_dups_pairwise_equiv}}
