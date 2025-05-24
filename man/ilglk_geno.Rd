@@ -1,7 +1,10 @@
 \name{ilglk_geno}
 \alias{ilglk_geno}
 \title{Check individual multilocus genotypes for typicality}
-\description{\code{ilglk_geno} computes the per-sample log-likelihood across its entire genotype, i.e. sum log Pr g(i,l); and compares the distribution across individuals to the theoretical distribution given allele frequencies. Some mismatch is normal (and can arise just from noise in allele-frequency estimates), but substantial mismatch is bad. You get to define "substantial". \code{ilglk_geno} can also detect outlier individuals, usually with lglks that are much too low rather than too high; I'm not sure what could generate "too typical a genome" at the individual level.
+\description{
+\code{ilglk_geno} computes the per-sample log-likelihood across its entire genotype, i.e. sum log Pr g(i,l); and compares the distribution across individuals to the theoretical distribution given allele frequencies. Some mismatch is normal (and can arise just from noise in allele-frequency estimates), but substantial mismatch is bad. You get to define "substantial". \code{ilglk_geno} can also detect outlier individuals, usually with lglks that are much too low rather than too high; I'm not sure what could generate "too typical a genome" at the individual level.
+
+Genotype encoding (see \code{\link{diplos}} etc) must be one of 4-way, 3-way, or 6-way. The \code{useN} field is honoured.
 }
 \usage{ilglk_geno(snpg, hist_pars = list(), showPlot = TRUE)
 }

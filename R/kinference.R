@@ -3003,7 +3003,16 @@ structure( function(
 ){
 ###################
   define_genotypes()
-  extract.named( snpg@locinfo[ cq(  PUP4, pbonzer)]) ## used to also call use6; not used
+  
+  # Be kind to the user with informative error messages (for once...)
+stopifnot( snpg %is.a% 'snpgeno',
+    all( cq( AB, OO) %in% diplos( snpg)),
+    !any( grepl( 'C', diplos( snpg))))
+  pbonzer <- snpg@locinfo$pbonzer %||% stop( 
+      "No allele freq estimates!")
+  PUP4 <- snpg@locinfo$PUP4 %||% stop( 
+      "No PUP4; did you forget 'kin_power'?")
+
   p0 <- pbonzer[,'O'] + pbonzer[,'C']
   pA <- pbonzer[,'A']
   pB <- pbonzer[,'B']
@@ -3115,9 +3124,7 @@ DESCRIPTION
 
 This test looks for samples with anomalous numbers of heterozygotes and/or double-nulls, which can result from (i) degraded DNA or (ii) sample contamination. Useful both for finding outlier samples, and for checking whether the loci are collectively working as they should (as is assumed by all the calculations in 'kinference'). The histogram should coincide nicely with its predicted line.
 
-The basis for the "hetzminoo" statistic is explained in the accompanying MS. Note that the 'target' argument provides two variants, "rich" and "poor", designed to test for contamination and degradation respectively. With "rich", you should look for outlying samples on the _RHS_ of the histogram (too many heterozygotes): with "poor", on the _LHS_ (too few). The choice of target affects the weightings across loci, as explained in the MS. In practice, there is often little visual difference, and a bad sample looks bad bad in both. Nevertheless, you _should_ run both variants.
-
-See 'kinference-vignette' (qv) for examples.
+The basis for the "hetzminoo" statistic is explained in the accompanying MS. Note that the 'target' argument provides two variants, "rich" and "poor", designed to test for contamination and degradation respectively. With "rich", you should look for outlying samples on the _RHS_ of the histogram (too many heterozygotes): with "poor", on the _LHS_ (too few). The choice of target affects the weightings across loci, as explained in the MS. In practice, there is often little visual difference, and a bad sample looks bad bad in both. Nevertheless, you _should_ run both variants. See 'kinference-vignette' (qv) for examples.
 
 
 USAGE
@@ -3132,7 +3139,7 @@ hetzminoo_fancy(
 
 ARGUMENTS
 
-  snpg: a 'snpgeno' object
+  snpg: a 'snpgeno' object, with allele frequencies already estimated and 'kin_power' (qv) already run.
 
   target: which potential problem to focus on.
 
@@ -3433,22 +3440,37 @@ structure( function(snpg, hist_pars=list(), showPlot = TRUE) {
   n_loci <- ncol( snpg)
   minfo_fields <- cq( Our_plate, Our_sample) %that.are.in% names( snpg$info)
 
-  if( suppressWarnings( all( snpg@diplos == genotypes6))) {
-  snpg4 <- snpgeno(
-      NULL,
-      diplos=genotypes4_ambig,
-      info= snpg@info[, minfo_fields],
-      locinfo= snpg@locinfo[, 'Locus', drop=FALSE]
-    )
-  snpg4[ snpg==OO] <- OO
-  snpg4[ snpg==AB] <- AB
-  snpg4[ snpg==AA] <- AAO
-  snpg4[ snpg==AO] <- AAO
-  snpg4[ snpg==BB] <- BBO
-  snpg4[ snpg==BO] <- BBO
-  } else if( suppressWarnings( all(snpg@diplos == genotypes4_ambig))) {
+  if( my.all.equal( snpg@diplos, genotypes6)) {
+    snpg4 <- snpgeno(
+        NULL,
+        diplos=genotypes4_ambig,
+        info= snpg@info[, minfo_fields],
+        locinfo= snpg@locinfo[, 'Locus', drop=FALSE]
+      )
+    snpg4[ snpg==OO] <- OO
+    snpg4[ snpg==AB] <- AB
+    snpg4[ snpg==AA] <- AAO
+    snpg4[ snpg==AO] <- AAO
+    snpg4[ snpg==BB] <- BBO
+    snpg4[ snpg==BO] <- BBO
+  } else if( my.all.equal( snpg@diplos, genotypes4_ambig)) {
       snpg4 <- snpg
-  } else { warning("snpg@diplos isn't one of genotypes6 or genotypes4_ambig, so I dunno what to do") }
+  } else if( my.all.equal( snpg@diplos, genotypes3)) {
+    useN[] <- 3
+    # Make a dummy 4-way
+    snpg4 <- snpgeno(
+      NULL,
+      diplos = genotypes4_ambig,
+      info= snpg4@info,
+      locinfo = snpg4@locinfo
+    )
+    snpg4[ snpg==AAO] <- AAO
+    snpg4[ snpg==BBOO] <- BBO
+    snpg4[ snpg==AB] <- AB
+  } else { 
+stop( "diplos( snpg) not one of the known ones")
+  }
+
   snpg3 <- snpgeno(
       NULL,
       diplos = genotypes3,
@@ -3596,6 +3618,8 @@ Check individual multilocus genotypes for typicality
 DESCRIPTION
 
 'ilglk_geno' computes the per-sample log-likelihood across its entire genotype, i.e. sum log Pr g(i,l); and compares the distribution across individuals to the theoretical distribution given allele frequencies. Some mismatch is normal (and can arise just from noise in allele-frequency estimates), but substantial mismatch is bad. You get to define "substantial". 'ilglk_geno' can also detect outlier individuals, usually with lglks that are much too low rather than too high; I'm not sure what could generate "too typical a genome" at the individual level.
+
+Genotype encoding (see 'diplos' etc) must be one of 4-way, 3-way, or 6-way. The 'useN' field is honoured.
 
 
 USAGE
