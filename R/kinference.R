@@ -2443,9 +2443,9 @@ stopifnot(
   }
 
   ## if snpg@diplos is genotypes4_ambig, convert whole lot to pseudo 6-way
-  if( my.all.equal( snpg@diplos, genotypes4_ambig)) {
+  if( my.all.equal( diplos( snpg), genotypes4_ambig)) {
     tempsnpg <- snpg
-    snpg@diplos <- genotypes6
+    diplos( snpg) <- genotypes6
     snpg[ tempsnpg == OO] <- OO
     snpg[ tempsnpg == AB] <- AB
     snpg[ tempsnpg == AAO] <- AA

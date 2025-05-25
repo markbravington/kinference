@@ -4,6 +4,8 @@
 ^README.Md
 ^doc$
 ^Meta$
+/vignettes/kvo
+/vignettes/precomp.R
 [.]/R/funs[.]rda
 R/meta.vignette.rds
 inst/tinytest/SMB
