@@ -22,7 +22,15 @@ and we are stuck with this kinda undebuggable horrorshow
 (though I did have the 'debug' package working on vignettes at one point... but apparently no longer)
 -->
 
-
+```{r startupchunkachunka, include=FALSE}
+# I cannot get the bloody cache to work :/
+knitr::opts_chunk$set( 
+    dev = 'png', fig.path='./figures-kinference/', fig.keep='high',
+    cache= FALSE
+#    cache= TRUE, cache.path='../cache-kinference/', 
+#    cache.rebuild=nzchar( Sys.getenv( 'VIGDECACHE_KINFERENCE'))
+  )
+```
 
 Package `kinference` uses SNP genotypes to find pairs of
 closely-related kin within a set of biological samples. In this
@@ -38,13 +46,11 @@ process as we throw new datasets with new problems at the
 software^[And sometimes the right solution is: get a better dataset,
 or move to a different problem. Sad but true.]! There may be courses;
 check with the package maintainer. If you have questions, first have a
-look at the new [Github Discussions
+look at the [Github Discussions
 page](https://github.com/orgs/closekin/discussions) for `closekin`,
 the parent Organisation of package `kinference`. Also, do look at
-`package?kinference` inside R, plus of course the detailed documention
-of individual functions^[But not _all_ of them. There are still a lot
-of documented functions in the package that people aren't supposed to
-use...]. This document makes reference in a few place to "the MS", a
+`?kinference` inside R, plus of course the detailed documention
+of individual functions. This document makes reference in a few place to "the MS", a
 long-awaited paper that gives details of all the algorithms used in
 this package. Unfortunately, the MS doesn't quite exist at time of
 writing, but it is coming...
@@ -72,11 +78,18 @@ under (strong) selection, etc.
 
 ## A quick look at the dataset
 
-```{r dropbears-overview1, dev='png'}
+<!-- Don't cache library() calls (I think)
+And suppress startup messages
+-->
+
+```{r libraries, results='hide', message=FALSE, cache=FALSE}
+library( mvbutils)     ## not sure if it needs to be explicitly loaded     
 library( gbasics)      ## so data objects behave nicely
 library( atease)       ## convenient access to attributes; x@thing
 library( kinference)
-library( mvbutils)
+```
+
+```{r dropbears-overview1} 
 kincol <- kinPalette() ## kin-specific colours, used later
 data( dropbears)
 
@@ -147,7 +160,7 @@ applications to date.] This (older) statistic is called "wpsex"
 close to 0 for POPs, and higher for UPs or other kin. First, let's get
 a global overview of the situation:
 
-```{r dropbears_findPOPs1, dev='png'}
+```{r dropbears_findPOPs1}
 # strongKin <- find_POPs(dropbears, limit_pairs=10000, keep_thresh=1)
 strongKin <- find_POPs(dropbears,
    keep_thresh=0.1) # upper limit guess of "interesting" wpsex values in other studies
@@ -248,7 +261,7 @@ rate is much higher than that, you probably won't be able to use your
 dataset for kin-finding anyway.
 
 
-```{r dropbears_split_FSPs_POPs, dev='png'}
+```{r dropbears_split_FSPs_POPs}
 splitPOPs <- split_FSPs_from_POPs( dropbears, strongest, gerr= 0.01)
 
 hist( splitPOPs$PLOD_FP, breaks= 50, main= "", xlab= "PLOD_FP")
@@ -303,7 +316,7 @@ low; 10000 should be fine. With all that in mind, here we go:
 
 
 
-```{r dropbears-findHSPs1, dev='png'}
+```{r dropbears-findHSPs1}
 ## find HSPs-or-stronger using find_HSPs
 
 ## Expected PLOD for UPs (thanks to 'kin_power' earlier):
@@ -338,7 +351,7 @@ hopefully between 1KPs and 2KPs (it's not vitally important where; see
 '?histoPLOD' for more).
 
 
-```{r dropbears_findHSPs2, dev='png'}
+```{r dropbears_findHSPs2}
 # 'bin' sets bin width for histo
 histoPLOD( HSPs_1, log=FALSE, fullsib_cut = 120, lb = -10, bin = 10)
 ```
@@ -364,7 +377,7 @@ PLOD, subset out the POPs that we already found, and be left with the
 FSPs.
 
 
-```{r FSPsplitty}
+```{r FSPlitty}
 POPsOrFSPs <- HSPs_1[HSPs_1$PLOD > 110,]           ## anywhere in the valley
 POPsOrFSPs$ij <- paste(POPsOrFSPs$i, POPsOrFSPs$j) ## pair ID to match the one in POPs
 FSPs <- POPsOrFSPs[!POPsOrFSPs$ij %in% POPs$ij,]   ## find our FSPs
@@ -375,25 +388,25 @@ Now, we have our set of POPs, our set of FSPs, and a set of tentative
 grandparent-grandchild, and full-thiatic pairs: we cannot split
 between those genetically^[Well, it is theoretically possible to
 improve somewhat on a blind guess, but you need high-resolution
-genomic data.], but in most CKMR applications, covariate data such as
+genomic data.], but in many CKMR applications, covariate data such as
 ages can do the job. In this particular case, the 2KPs will almost all be HSPs, on demographic grounds (details out of scope here). However,
 the bigger issue is that the set of tentative 2KPs may well be
 contaminated by more-distant kin, mainly 3KP (half-thiatic and
 great-grandparent-grandchild pairs) and 4KP (e.g. half-first-cousin
 pairs). We have already gotten rid of the 1KPs, but for the rest we
 now need to decide on a PLOD cutoff above which we will treat
-everything as "almost definite 2KP". We will then use the distribution
+everything as "definite 2KP". We will then use the distribution
 of PLODs among those "definite 2KPs" to work out how many
 false-negative 2KPs are likely to have fallen below the cutoff. Unlike
 with 1KPs vs 2KPs, there won't be a clean break, so things get a bit
 more complicated.
 
-The idea of choosing the cutoff is to let us retain a (hopefully large) proportion of true 2KPs, subject to a tolerance on the expected number of contaminating 3KPs and 4KPs that by chance fall above the threshold. That tolerance is up to you; you really don't want many false-positives from 3KPs because they can mess up a CK model. The problem isn't the _number_ of false-positives; rather, it's the different dynamics that different kinships have. Most of all, 3KPs tend to have much longer birth-gaps than HSPs, so that mislabelling even a couple of 3KPs as "HSPs" can cause a substantial bias in mortality-rate estimates. (Note that it doesn't cause bias to discard some true 2KPs below the cutoff, because we can compensate by incorporating the estimated false-negative rate directly into the CKMR model.) While it's a good idea to choose a high cutoff for that reason, there is a trade-off; higher cutoffs do lead to fewer definite 2KPs going into the model, and thus to higher variances, as well as making it harder to check model diagnostics. 
+The idea of choosing the cutoff is to let us retain a (hopefully large) proportion of true 2KPs, subject to a tolerance on the expected number of contaminating 3KPs and 4KPs that by chance fall above the threshold. That tolerance is up to you; you really don't want many false-positives from 3KPs because they can mess up a CK model. The problem isn't the _number_ of false-positives; rather, it's the different dynamics that different kinships have. Most of all, 3KPs tend to have much longer birth-gaps than HSPs, so that mislabelling even a couple of 3KPs as "HSPs" can cause a substantial bias in mortality-rate estimates. (Note that it doesn't cause bias to discard some true 2KPs below the cutoff, because we can compensate by incorporating the estimated false-negative rate directly into the CKMR model.) While it's a good idea to choose a high cutoff for that reason, there is a trade-off; higher cutoffs do lead to fewer definite 2KPs going into the model, and thus to higher variances, as well as making it harder to check model diagnostics. Nevertheless, you should certainly go high enough to get your estimated false-positive rate well _below_ the false-negative rate; you defintely _don't_ want "equal probabilities" here.
 
 We have often chosen the cutoff at a round number by eye, but a more systematic approach is via the `autopick_threshold` function. This takes the empirical distribution of PLODs in the tentative 2KPs, estimates the impact of linkage, and--- on the assumption that each comes from either a 2KP, 3KP, or 4KP--- fits a constrained mixture decomposition (see function documentation and MS for details) to estimate the underlying distributions and numbers of 2KPs/3KPs/4KPs, before numerically choosing a cutoff to achieve the desired tolerance. When `autopick_threshold` works well, it's great; but don't trust its output if it doesn't look sensible, because it may have too much flexibility in fitting especially when the number of kin-pairs is low. Whether-or-not you use `autopick_threshold`, the process _is_ intrinsically subjective, because _you_ have to decide how many 3KPs you are willing to tolerate. So, picking a cutoff by eye is also OK (because the false-negative rate computed afterwards will eliminate bias), as long as you don't try to "tweak" the cutoff to include/exclude specific pairs.
 
 
-```{r splitHSPsFromThiatics, dev='png'}
+```{r splitHSPsFromThiatics}
 HSPs_1$ij <- paste(HSPs_1$i, HSPs_1$j)
 HSPs_2 <- HSPs_1[!HSPs_1$ij %in% c(POPs$ij, FSPs$ij),] 
 ## plot the empirical PLODs with the expected distribution
@@ -438,7 +451,7 @@ but again any reasonable choice should lead to the same final set of
 POPs.
 
 
-```{r dropbears_POP_lglk1, dev='png'}
+```{r dropbears_POP_lglk1}
 ## Assume modest error rate
 sk1 <- find_POPs_lglk( dropbears, gerr= 0.01, limit_pairs= 200, keep_thresh= -5)
 histoPLOD( sk1, log=TRUE)
@@ -516,7 +529,7 @@ downstream. The P-values are more to be taken as _relative_ measures
 of well-behavedness here.
 
 
-```{r bluefin6and4, dev='png'}
+```{r bluefin6and4}
 pvals <- check6and4(bluefin, thresh_pchisq_6and4 = c(1e-4, 1e-6), show6 = FALSE)
 ```
 
@@ -536,7 +549,7 @@ loci with P < 1e-10. After the rest of the cleaning stages, we can
 (and will!) revisit these P-values without the bad samples.
 
 
-```{r bluefin1, dev='png'}
+```{r bluefin1}
 bluefin_1 <- bluefin[, pvals$pval4 > 1e-10]
 pvals_1 <- check6and4(bluefin_1, thresh_pchisq_6and4 = c(1e-4, 1e-6), show6 = FALSE)
 ## pvals_1 is storage so we can check back on the same scores later
@@ -547,7 +560,7 @@ pvals_1 <- check6and4(bluefin_1, thresh_pchisq_6and4 = c(1e-4, 1e-6), show6 = FA
 Now, let's check for duplicate samples
 
 
-```{r bluefinFindDups, dev='png'}
+```{r bluefinFindDups}
 ## look for duplicates, noting any pairs with <50 different genotypes:
 dups <- find_duplicates(bluefin_1, max_diff_loci = 50)
 nrow(dups) ## 24 pairs of animals with fewer than 50 different genotypes
@@ -581,7 +594,7 @@ look like they're drawn from the same population as everyone else
 aren't usable for kinference, at least not with this software.
 
 
-```{r bluefinIlglk, dev='png'}
+```{r bluefinIlglk}
 ilglk <- ilglk_geno(bluefin_2)
 abline(v = -1525) ## put our cutoff here
 ```
@@ -596,7 +609,7 @@ animal with an ilglk score less than -1525 or so is not believable as
 a member of the same stock as the main spike. Let's remove them.
 
 
-```{r bluefinIlglk2, dev='png'}
+```{r bluefinIlglk2}
 bluefin_3 <- bluefin_2[ilglk > -1525,]
 ## now, does it look any better?
 ilglk <- ilglk_geno(bluefin_3)
@@ -611,7 +624,7 @@ bluefin_3 <- kin_power(bluefin_3, k = 0.5)
 Now, we need to _try_ to find and remove cross-contaminated or degraded samples. Checking for excess or deficiency of heterozygosity is the way to go here, but there some subtle details to do with null alleles and so on; see MS^[Which doesn't exist _yet_...]. The function for this is `hetzminoo_fancy`, which has a "rich" variant optimized for finding contamination, and a "poor" variant for degradation. With "rich", you're looking for too-big values; with "poor", for too-small values--- although it must be said that the two variants tend to look pretty similar.
 
 
-```{r bluefinHetzes, dev='png'}
+```{r bluefinHetzes}
 hetzpoor <- hetzminoo_fancy(bluefin_3, "poor") ## ... maybe a couple of outlying low samples 
 hetzrich <- hetzminoo_fancy(bluefin_3, "rich") ## ... maybe no high ones (debatable!)
 bluefin_4 <- bluefin_3[hetzpoor > 0.17,] ## remove the outlying low hetzpoor scores
@@ -629,7 +642,7 @@ loci we stored earlier, re-calculate them now that we've removed all
 the bad fish, and see whether the loci look any better.
 
 
-```{r bluefin6and4sMk2, dev='png'}
+```{r bluefin6and4sMk2}
 pvals_2 <- check6and4(bluefin_4, thresh_pchisq_6and4 = c(1e-4, 1e-6), show6 = FALSE)
 
 lociPvals <- data.frame(
@@ -665,7 +678,7 @@ kin-finding routine again here - it would be the same as for
 `dropbears` (see **Section One**). I'll just show you the "histoPLOD", so you
 can see that kin-finding would now work for `bluefin`, cleaned as it is.
 
-```{r bluefinKinfer, dev='png'}
+```{r bluefinKinfer}
 ## As outlined in Section 1, `keep_thresh` sets a PLOD limit to
 ## prevent storing umpteen-millions of PLODs. Negative 10 i	s a often
 ## about right, but you may need to set it lower (to store more PLODs)
@@ -764,7 +777,7 @@ duplicates, so the differences to the null distributions aren't
 pronounced.
 
 
-```{r keptDups, dev='png'}
+```{r keptDups}
 dupHSPs <- find_HSPs(bluefin_exceptDups, keep_thresh = -10)
 ## histoPLOD( dupHSPs, log=TRUE) # use the logged version to pick the fullsib_cut
 histoPLOD( dupHSPs, log=FALSE, lb = 20, fullsib_cut = 150)
@@ -783,7 +796,7 @@ alleles that are rare in population A but more common (or even fixed)
 in population B.
 
 
-```{r keptIlglks, dev='png'}
+```{r keptIlglks}
 # par(mfrow = c(2,1))
 ilglkHSPs <- find_HSPs(bluefin_exceptIlglks, keep_thresh = -10, minbin = -150)
 ## there are a bunch of 'less related than expected' fish in the low tail
@@ -871,7 +884,7 @@ left in, then show contamination cleaning, and finally kin-finding
 outputs on the cleaned dataset.
 
 
-```{r ctm_bluefin_loci, dev='png'}
+```{r ctm_bluefin_loci}
 pvals_ctm <- check6and4(ctm_bluefin, thresh_pchisq_6and4 = c(1e-4, 1e-6), show6 = FALSE)
 
 pvals_clean <- check6and4(bluefin, thresh_pchisq_6and4 = c(1e-4, 1e-6), show6 = FALSE)

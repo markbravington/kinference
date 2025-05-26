@@ -3701,20 +3701,6 @@ structure( function( lociar,
 
   li1 <- li[1,]
 
-`%without.names%` <- function( x, what) {
-    new.names <- names( x) %except% what
-    if( identical( new.names, names( x))) {
-      return( x)   # also works if names(x) is NULL!
-    }
-
-    oatts <- attributes( x)
-    # oatts must exist, since nameless-x returns earlier
-    x <- x[ new.names]
-    oatts$names <- new.names
-    attributes( x) <- oatts
-    return( x)
-}
-
   temp0 <- with( li1, calc_g6probs_IBD0_scalar( pbonzer, snerr, record=TRUE))
   cg6p0 <- make_playback( calc_g6probs_IBD0_scalar, temp0)
 
@@ -3735,12 +3721,12 @@ structure( function( lociar,
   if( exists( 'genotypes4_ambig', inherits=FALSE)) { # TRUE unless overridden sneakily...
     extract.named( map6to4( g6p0, g6p1, g6p2))
     s4 <- predict_hsp_util( g4p0, g4p1, g4p2, want_LOD_table, k=k,
-        hack_LOD=hack_LOD$LOD4) %without.names% "matto"
+        hack_LOD=hack_LOD$LOD4) %without.name% "matto"
 
     ### 3way too:
     extract.named( map6to3( g6p0, g6p1, g6p2))
     s3 <- predict_hsp_util( g3p0, g3p1, g3p2, want_LOD_table, k=k,
-        hack_LOD=hack_LOD$LOD3) %without.names% "matto"
+        hack_LOD=hack_LOD$LOD3) %without.name% "matto"
 
     if( want_LOD_table) { # overrides predict_hsp_util's version of want_LOD_table
       # We want LOD6, PUP4, etc (matrices with cols "AB/AA" etc)
