@@ -1,7 +1,9 @@
 # this does not work right FFS
-^.*\.Rproj$
-^\.Rproj\.user$
+/[.]Rproj$
+^/[.]Rproj/[.]user$
 ^README.Md
+[.]git$
+[.]git/
 ^doc$
 ^Meta$
 /vignettes/kvo

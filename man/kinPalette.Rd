@@ -28,8 +28,11 @@ so that any palette changes are temporary and can be undone.
 \item{ kinships}{which kinships to return colors for. Default is all of them.}
 \item{ setPalette}{set to TRUE if you really want to set graphics palette.}
 }
-\value{A character vector of hex codes, with names "POP" etc. If the \code{kinships} argument is specified, then just those elements will be returned.
+\value{A character vector of hex codes, with names "POP" etc. If the \code{kinships} argument is specified, then just the corresponding elements will be returned.
 }
-\references{Simon Garnier, Noam Ross, Antônio Camargo, Bob Rudis, Kara Woo, & Marco Sciaini. (2023). sjmgarnier/viridisLite: CRAN release v0.4.2 (v0.4.2CRAN). Zenodo. https://doi.org/10.5281/zenodo.7890875
+\references{
+S. Garnier, N. Ross, A. Camargo, B. Rudis, K. Woo, & M. Sciaini. (2023). sjmgarnier/viridisLite: CRAN release v0.4.2 (v0.4.2CRAN). Zenodo. https://doi.org/10.5281/zenodo.7890875
+
+(NB I had to abbreviate the authors' first names to avoid stupid unnecessary warning from R{} CMD CHECK about non-ASCII characters... in a raw string... in the days of mandatory UTF-8... sigh)
 }
 \keyword{misc}

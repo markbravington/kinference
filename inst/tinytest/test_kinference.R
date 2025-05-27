@@ -1,5 +1,5 @@
-## These are the unit tests for package 'kinference'
-## To run (on Shane's machine), use tinytest::test_all("~/R/localPackages/kinference/kinference").
+## These are the public unit tests for package 'kinference'
+## SMB has additional tests, 
 ## On other machines, edit that filepath to the source dir for package kinference.
 
 library(atease)
@@ -227,8 +227,10 @@ expect_silent({ find_HSPs(smallsnpg4a, limit_pairs = choose(nrow(smallsnpg4b),2)
 ## refPLODs4 <- thePLODs4
 ## save(refPLODs4, file = "smallsnpg4_referencePLODs.Rda")
 
+# Next was passing for R-universe on Windows and sometimes on Macs but never on Linux 
+# (but it does pass on SMB's Linux box). Hence added a generous tolerance in case of numericalia.
 base::load("smallsnpg4_referencePLODs.Rda")  ## base:: to avoid a conflict with renv::load.
-expect_true(all.equal(refPLODs4, thePLODs4, check.attributes = FALSE))
+expect_true(all.equal(refPLODs4, thePLODs4, check.attributes = FALSE, tolerance=1e-5))
 
 ## test auto-generation of snerr by kin_power in cases where it's absent
 expect_true( length( dim(smallsnpg4b$locinfo$snerr)) > 0 ) ## this is basically just

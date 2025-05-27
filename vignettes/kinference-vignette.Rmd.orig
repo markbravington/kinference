@@ -1,8 +1,9 @@
 ---
 title: "Inferring kin relationships with kinference"
 author: S M Baylis and M V Bravington
-output: 
-  rmarkdown::html_vignette
+output:
+  rmarkdown::html_vignette:
+    toc: true
 vignette: >
   %\VignetteIndexEntry{Inferring kin relationships with kinference}
   %\VignetteEngine{knitr::rmarkdown}
@@ -13,13 +14,19 @@ vignette: >
 YAML headers, HTML syntax (here), what bit of code is doing what? aaaargh
 Good intentions, but people have tried to make it do TOO MUCH
 and the proliferation of low-level details have obscured the high-level appeal.
-and I am spending more time trying to get it to all work together
-and I worry that in 6 months' time when I revisit it, I will have forgetton how to make stuff work...
+and I am spending more time trying to get it to all work together than I am on writing the docu
+and I worry that in 6 months' time when I revisit it, I will have forgetton how to make stuff work... (just verified; it's true :/)
 And EG, how good is it that we need yet another comment marker; # // % not enough it seems
 or someone suggests ~~~{=comment} ... ~~~ of course how clear
 but that doesn't even work
-and we are stuck with this kinda undebuggable horrorshow
-(though I did have the 'debug' package working on vignettes at one point... but apparently no longer)
+and we are stuck with this mess
+no doubt all it needs is another format, maybe add some json :/ 
+("joke")
+-->
+
+<!--
+The other big problem is that vignettes are an undebuggable horrorshow
+FWIW I *did* have the 'debug' package working on vignettes at one point... but apparently no longer...
 -->
 
 ```{r startupchunkachunka, include=FALSE}
