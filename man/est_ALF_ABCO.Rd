@@ -32,8 +32,7 @@ est_ALF_ABCO( lociar, geno_amb = attr( lociar, 'geno_amb'))
 \seealso{\code{\link{est_ALF_ABO_quick}} for normal users, \code{\link{est_ALF_6way}} for special 6-way people.
 }
 \examples{
-data( bluefin)
-head( bluefin$pbonzer) #
+head( bluefin$pbonzer) # C alleles sometimes present
 bluefin$locinfo$pbonzer <- NULL ## remove pre-existing ALFs
 bluefin$locinfo$snerr <- NULL ## remove pre-existing snerr
 bluefin <- re_est_ALF( bluefin)

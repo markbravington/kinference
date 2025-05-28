@@ -23,7 +23,6 @@ We haven't added any formal uh-oh criteria yet; that could be done via the SPA, 
 \value{Vector of log-likelihood for each individual; also usually (but optionally), a histogram of log-likelihood values across individuals.
 }
 \examples{
-data( bluefin)
 ## get rid of really bad loci
 pvals <- check6and4( bluefin, thresh_pchisq_6and4 = c( 0.001, 0.0001))
 bluefin_1 <- bluefin[ , pvals$pval4 > 0.01] # drastic QC!

@@ -36,7 +36,6 @@ est_ALF_nonulls( x=NULL, AB, AA, BB,
 \value{If \code{x} is supplied, then its \code{locinfo} attribute will be augmented with the \code{pbonzer} (allele frequency) matrix required by most \code{\link{kinference}} functions. Note that \code{pbonzer} has 4 columns always, so here the 3rd column ("C") is set to zero. If \code{x} is not supplied, then a 3-column matrix matrix is returned. Rowsums of the matrix are always 1 in either case.
 }
 \examples{
-#data( dropbears)
 #dropbears$locinfo$pbonzer <- NULL ## no population allele frequency estimates!
 #dropbears <- est_ALF_ABO_quick( dropbears)
 #head( dropbears$locinfo$pbonzer)

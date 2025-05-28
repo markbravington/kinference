@@ -10,29 +10,6 @@ vignette: >
   \usepackage[utf8]{inputenc}
 ---
 
-<!--
-It would be great to produce two versions, one in PDF so you can peruse it while not glued to your goddamn screen. BUT R has no mechanism to support this, and suggestions to the contrary seem to elicit the usual CRANiac moanings. I *could* manually produce a PDF and ship it alongside, but 
-TBF the PDF produced by the following doesn't look very pretty anyway, but no doubt it could be tweaked with lashing of options:
-  pdf_document:
-    latex_engine: pdflatex
-    pandoc_args: [ --listings ]  
-    
-The closest approach is something like this, suggested by Peter Harrison in 2018, to make a special-prupose 'knit' function that produces all outputs.
-	title: "multiple outputs"
-	output:
-		word_document: default
-		html_document: default
-	knit: (function(inputFile, encoding) {
-		rmarkdown::render(inputFile, encoding = encoding,
-		output_dir = "output", output_format = "all") })
-  
-but I don't have 
-
-"C:\Program Files\Microsoft\Edge\Application\msedge.exe" --headless --print-to-pdf="c:\outdir\out.pdf" "c:\indir\in.html"
-
-
--->
-
 <!-- MVB: This bloody rmarkdown process has gotten WAY too complicated.
 YAML headers, HTML syntax (here), what bit of code is doing what? aaaargh
 Good intentions, but people have tried to make it do TOO MUCH
@@ -54,12 +31,11 @@ FWIW I *did* have the 'debug' package working on vignettes at one point... but a
 
 
 
-Package `kinference` uses SNP genotypes to find pairs of
-closely-related kin within a set of biological samples. In this
-vignette, we: demonstrate the core functions for kin-finding with a
-perfect dataset (section 1); clean up a 'typical' dataset to get it to
-work for kinfinding (section 2); and show _some_ warning signs of
-Things Going Wrong (section 3).
+Package `kinference` uses SNP genotypes to find pairs of closely-related kin within a set of biological samples, presumably for use in Close-Kin Mark-Recapture. In this vignette, we: 
+
+1. demonstrate the core functions for kin-finding with a perfect dataset (section 1); 
+1. clean up a 'typical' dataset to get it to work for kinfinding (section 2); 
+3. and show _some_ warning signs of Things Going Wrong (section 3). 
 
 Kinference can be pretty complicated, though it isn't always. We can't
 show everything here; this is actually a subset of a much larger
@@ -115,8 +91,8 @@ library( kinference)
 
 ``` r
 kincol <- kinPalette() ## kin-specific colours, used later
-data( dropbears)
 
+## 'dropbears' is a dataset that comes with 'kinference'
 ## Very quick look at snpgeno data: covariates and some genotypes of a few samples
 dim( dropbears)
 ```
@@ -694,8 +670,7 @@ we won't recompute them, but here's how to do it:
 
 
 ``` r
-data(bluefin)
-
+# 'bluefin' is a dataset that comes with 'kinference'
 # Check genotype encoding:
 diplos( bluefin)  # aha, 6-way genotyping (legacy CSIRO data)
 ```

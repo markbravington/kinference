@@ -45,8 +45,8 @@ The statistic for \code{split_FSPs_from_POPs} - which isn't as powerful as I'd h
 }
 }
 \examples{
-`@` <- atease::'@' # ... then x@att is easier than attr( x, 'att')
-data( bluefin)
+library( atease) # so x@att--- easier than attr( x, 'att')
+## bluefin data
 ## stripped-down data-cleaning for example - see the
 ## vignette for approach with real data!
 pvals <- check6and4( bluefin, thresh_pchisq_6and4 = c( 0.001, 0.0001))

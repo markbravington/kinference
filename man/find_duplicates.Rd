@@ -127,7 +127,8 @@ For POPs and HSPs, the items below are also returned as attributes (which can be
 }
 \examples{
 ## find_duplicates
-library( mvbutils)
+library( atease) # @ used somewhere below
+library( mvbutils) # IDNK if this is needed explicitly
 define_genotypes()    ## creating 'genotypes4_ambig' etc
 x <- matrix(sample(c("AAO", "AB", "BBO", "OO"), 10000, TRUE,
     prob = c(0.2, 0.45, 0.2, 0.15)), nrow = 100, ncol = 100)
@@ -162,7 +163,7 @@ droppers     ## note that _all but one_ of each _group_ of
 ## Drop all-but-one of each set of duplicates:
 minisnpg_nodups <- minisnpg[ - droppers,]
 ## find_HSPs (PLOD_HU)
-data( bluefin)
+## bluefin data
 ## stripped-down data-cleaning for example - see the
 ## vignette for approach for real data!
 pvals <- check6and4( bluefin, thresh_pchisq_6and4 = c( 0.001, 0.0001))

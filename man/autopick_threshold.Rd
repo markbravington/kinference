@@ -45,7 +45,6 @@ Despite the name, \emph{you} still have to supply sensible values for a couple o
 \seealso{\code{\link{kin_power}}, \code{\link{var_PLOD_kin}}
 }
 \examples{
-data( dropbears)
 dropbears1 <- kin_power( dropbears, k = 0.5)
 hsps <- find_HSPs( dropbears1, keep_thresh = -10)
 histoPLOD( hsps, log=TRUE) ## observe HSP - POP gap centred ~ PLOD = 120.

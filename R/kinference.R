@@ -428,7 +428,6 @@ SEE.ALSO
 
 EXAMPLES
 
-data( dropbears)
 dropbears1 <- kin_power( dropbears, k = 0.5)
 hsps <- find_HSPs( dropbears1, keep_thresh = -10)
 histoPLOD( hsps, log=TRUE) ## observe HSP - POP gap centred ~ PLOD = 120.
@@ -1294,7 +1293,6 @@ SEE.ALSO
 
 EXAMPLES
 
-data( bluefin)
 head( bluefin$locinfo$snerr) ## has to exist for 6-way genotypes
 bluefin$locinfo$pbonzer <- NULL ## remove pre-existing allele freq
 ## estimates!
@@ -1469,8 +1467,7 @@ SEE.ALSO
 
 EXAMPLES
 
-data( bluefin)
-head( bluefin$pbonzer) #
+head( bluefin$pbonzer) # C alleles sometimes present
 
 bluefin$locinfo$pbonzer <- NULL ## remove pre-existing ALFs
 bluefin$locinfo$snerr <- NULL ## remove pre-existing snerr
@@ -1743,7 +1740,6 @@ If 'x' is supplied, then its 'locinfo' attribute will be augmented with the 'pbo
 
 EXAMPLES
 
-data( dropbears)
 dropbears$locinfo$pbonzer <- NULL ## no population allele frequency estimates!
 dropbears <- est_ALF_ABO_quick( dropbears)
 head( dropbears$locinfo$pbonzer)
@@ -2171,8 +2167,9 @@ For POPs and HSPs, the items below are also returned as attributes (which can be
 EXAMPLES
 
 ## find_duplicates
+library( atease) # @ used somewhere below
+library( mvbutils) # IDNK if this is needed explicitly
 
-library( mvbutils)
 define_genotypes()    ## creating 'genotypes4_ambig' etc
 x <- matrix(sample(c("AAO", "AB", "BBO", "OO"), 10000, TRUE, 
     prob = c(0.2, 0.45, 0.2, 0.15)), nrow = 100, ncol = 100)
@@ -2215,7 +2212,7 @@ minisnpg_nodups <- minisnpg[ - droppers,]
 
 ## find_HSPs (PLOD_HU)
 
-data( bluefin)
+## bluefin data
 ## stripped-down data-cleaning for example - see the
 ## vignette for approach for real data!
 pvals <- check6and4( bluefin, thresh_pchisq_6and4 = c( 0.001, 0.0001))
@@ -2882,104 +2879,6 @@ function( thing, seed) {
   thing %where% (i %in% set | j %in% set)
 }
 
-
-"get_pair_covars" <-
-structure( function(snpg, pairs, fields = NULL, subset1 = 1 %upto% nrow(snpg),
-                            subset2 = subset1
-){
-warning( "do you really want to call this? it's easy just to extract the covariates yourself...")
-
-    if(all(subset2 == subset1) & length(subset1) == nrow(snpg) & max(c(subset2, subset1)) <= nrow(snpg)) {
-        ## simplest, most common case: i and j are just indices in snpg
-        iCovs <- snpg@info[pairs$i,]
-        jCovs <- snpg@info[pairs$j,]
-    } else if(max(c(subset2, subset1)) <= nrow(snpg)) {
-        ## subset 2 isn't subset 1, but they're both within nrow(snpg)
-        iinfo <- snpg@info[subset1,]
-        jinfo <- snpg@info[subset2,]
-
-        iCovs <- iinfo[pairs$i, ]
-        jCovs <- jinfo[pairs$j, ]
-    } else {
-        stop("the subsets appear to be ill-formed: they specify animals that don't exist in snpg")
-    }
-
-    if( !is.null(fields)) {
-        if(all(fields %in% names(iCovs)) & all(fields %in% names(jCovs))) {
-            iCovs <- iCovs[,fields]
-            jCovs <- jCovs[,fields]
-        } else {
-            fields <- fields[fields %in% names(iCovs)]
-            if(length(fields) == 0) {
-                warning("'fields' is specified, but no values match names of covariate data in snpg. Returning empty fields...")
-            } else {
-                warning("some names in 'fields' aren't in the names of the covariate data in snpg. Returning all matching fields...")
-            }
-            iCovs <- iCovs[,fields]
-            jCovs <- jCovs[,fields]
-        }
-    }
-
-    pairs@i_covars <- iCovs
-    pairs@j_covars <- jCovs
-
-    return(pairs)
-}
-, secret_doc =  mvbutils::docattr( r"{
-get_pair_covars      package:kinference
-
-
-(Obsolete) Get pair covariate data
-
-
-DESCRIPTION
-
-MVB reckons this is obsolete, and should be removed;  it's very easy to extract the covariates of kin-pairs by hand, and some degree of familiarity with the data structures is probably a Good Thing for users. However, I don't want to accidentally over-break any pipelines that might use it...
-
-Gets sample covariate data for samples 'i' and 'j' in a pair data.frame returned by 'find_HSPs', 'find_POPs', etc. Sample covariate data are returned as one data.frame for each sample: pairs@i_covars contains the covariate data for sample _i_, and pairs@j_covars for sample _j_.
-
-
-USAGE
-
-get_pair_covars(
-  snpg,
-  pairs,
-  fields = NULL,
-  subset1 = 1 %upto% nrow(snpg),
-  subset2 = subset1
-)
-
-
-ARGUMENTS
-
-  snpg: the 'snpgeno' dataset from which the pairs were called
-
-  pairs: the output from a call to a 'find_' or 'split_' function from package 'kinference', or a row-wise subset of such an output.
-
-  fields: if NULL (the default), will return all covariate fields for each sample. Otherwise, should be a vector whose values match column names in 'snpg@info', and will return only the named covariates.
-
-  subset1: should be left as the default unless subset-comparisons were specified in the 'find_' call that generated 'pairs', in which case should be set matching the subset-comparisons specified in that call
-
-  subset2: see subset1
-
-
-VALUE
-
-the data.frame given in 'pairs', with additional data.frames pairs@i_covars and pairs@j_covars containing covariate data for sample 'i' and 'j', respectively.
-
-
-EXAMPLES
-
-# This is why you don't need this function...
-data( bluefin)
-bluefin <- kin_power( bluefin, k=0.5)
-flub <- find_HSPs( bluefin, keep=-5, eta=-5)
-covar_i <- bluefin$info[ flub[,1],]
-covar_j <- bluefin$info[ flub[,2],]
-
-}")
-
-)
 
 "gtab6to4" <-
 function( gt6) {
@@ -3652,7 +3551,6 @@ Vector of log-likelihood for each individual; also usually (but optionally), a h
 
 EXAMPLES
 
-data( bluefin)
 ## get rid of really bad loci
 pvals <- check6and4( bluefin, thresh_pchisq_6and4 = c( 0.001, 0.0001))
 bluefin_1 <- bluefin[ , pvals$pval4 > 0.01] # drastic QC!
@@ -3831,10 +3729,8 @@ VALUE
 
 EXAMPLES
 
-data( dropbears)
-## not run:
-## fails because of missing pre-calculated objects necessary for kin-finding:
-## hsps <- find_HSPs( dropbears, keep_thresh = 0)
+## Next will fail cozza missing pre-calculated objects necessary for kin-finding:
+try( hsps <- find_HSPs( dropbears, keep_thresh = 0))
 
 dropbears_1 <- kin_power( dropbears, k = 0.5)
 ## works now
@@ -5239,9 +5135,9 @@ The statistic for 'split_FSPs_from_POPs' - which isn't as powerful as I'd hoped;
 
 EXAMPLES
 
-`@` <- atease::'@' # ... then x@att is easier than attr( x, 'att')
+library( atease) # so x@att--- easier than attr( x, 'att')
 
-data( bluefin)
+## bluefin data
 ## stripped-down data-cleaning for example - see the
 ## vignette for approach with real data!
 

@@ -39,12 +39,11 @@ knitr::opts_chunk$set(
   )
 ```
 
-Package `kinference` uses SNP genotypes to find pairs of
-closely-related kin within a set of biological samples. In this
-vignette, we: demonstrate the core functions for kin-finding with a
-perfect dataset (section 1); clean up a 'typical' dataset to get it to
-work for kinfinding (section 2); and show _some_ warning signs of
-Things Going Wrong (section 3).
+Package `kinference` uses SNP genotypes to find pairs of closely-related kin within a set of biological samples, presumably for use in Close-Kin Mark-Recapture. In this vignette, we: 
+
+1. demonstrate the core functions for kin-finding with a perfect dataset (section 1); 
+1. clean up a 'typical' dataset to get it to work for kinfinding (section 2); 
+3. and show _some_ warning signs of Things Going Wrong (section 3). 
 
 Kinference can be pretty complicated, though it isn't always. We can't
 show everything here; this is actually a subset of a much larger
@@ -98,8 +97,8 @@ library( kinference)
 
 ```{r dropbears-overview1} 
 kincol <- kinPalette() ## kin-specific colours, used later
-data( dropbears)
 
+## 'dropbears' is a dataset that comes with 'kinference'
 ## Very quick look at snpgeno data: covariates and some genotypes of a few samples
 dim( dropbears)
 dropbears[1:3, 1:5]
@@ -500,8 +499,7 @@ we won't recompute them, but here's how to do it:
 
 
 ```{r loady_bluefin}
-data(bluefin)
-
+# 'bluefin' is a dataset that comes with 'kinference'
 # Check genotype encoding:
 diplos( bluefin)  # aha, 6-way genotyping (legacy CSIRO data)
 ## if you're using 4-way genotypes(most likely)

@@ -12,7 +12,6 @@
 \seealso{\code{\link{est_ALF_ABCO}}, \code{\link{re_est_ALF}}, and \code{\link{est_ALF_ABO_quick}}
 }
 \examples{
-data( bluefin)
 head( bluefin$locinfo$snerr) ## has to exist for 6-way genotypes
 bluefin$locinfo$pbonzer <- NULL ## remove pre-existing allele freq
 ## estimates!

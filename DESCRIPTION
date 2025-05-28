@@ -16,5 +16,6 @@ NeedsCompilation: YES
 Encoding: UTF-8
 KeepSource: TRUE
 Collate: kinference.R Cloaders_kinference.R
-LazyData: false
-Version: 1.1.32
+LazyData: yes
+LazyDataCompression: xz
+Version: 1.1.37
