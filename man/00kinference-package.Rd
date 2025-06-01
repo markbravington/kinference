@@ -6,6 +6,8 @@
 \docType{package}
 \title{Kin-finding and QC for Close-Kin Mark-Recapture}
 \description{
+This is a beta version; please don't use it unless the maintainers have specifically mentioned it to you! Full release is very close...
+
 \code{kinference} covers the preparatory steps leading towards Close-Kin Mark-Recapture, for a multilocus dataset from many individuals that has already been genotyped. Specifically, it covers:
 
 \itemize{
